@@ -1,7 +1,8 @@
 #include "WorldPosition.h"
+#include "GameFramework/Actor.h"
 
 #define LOG_TO_SCREEN(Text) \
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT(Text));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, (TEXT("%s"), (FString)Text));
 
 // Sets default values for this component's properties
 UWorldPosition::UWorldPosition()
@@ -19,13 +20,14 @@ void UWorldPosition::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Log, TEXT("Log"));
-	UE_LOG(LogTemp, Warning, TEXT("Warning!"));
-	UE_LOG(LogTemp, Error, TEXT("Error!"));
-
-	LOG_TO_SCREEN("Test");
+	TArray<FStringFormatArg> args;
+	args.Add(FStringFormatArg(GetName()));
+	args.Add(FStringFormatArg(GetOwner()->GetName()));
+	FString Test = FString::Format(TEXT("Component: {0} - Object Name is: {1}"), args);
+	//LogMessage.Append((TEXT("%s"), GetName()));
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *Test);
+	LOG_TO_SCREEN(*Test);
 }
-
 
 // Called every frame
 void UWorldPosition::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
