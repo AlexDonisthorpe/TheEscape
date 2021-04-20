@@ -20,13 +20,11 @@ void UWorldPosition::BeginPlay()
 {
 	Super::BeginPlay();
 
-	TArray<FStringFormatArg> args;
-	args.Add(FStringFormatArg(GetName()));
-	args.Add(FStringFormatArg(GetOwner()->GetName()));
-	FString Test = FString::Format(TEXT("Component: {0} - Object Name is: {1}"), args);
-	//LogMessage.Append((TEXT("%s"), GetName()));
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *Test);
-	LOG_TO_SCREEN(*Test);
+	const FVector ObjectPosition = GetOwner()->GetActorLocation();
+	const FString PositionText = FString::Printf(TEXT("%s : x:%.2f, y:%.2f, y:%.2f"), *GetOwner()->GetName() ,ObjectPosition.X, ObjectPosition.Y, ObjectPosition.Z);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *PositionText);
+	LOG_TO_SCREEN(*PositionText);
 }
 
 // Called every frame
