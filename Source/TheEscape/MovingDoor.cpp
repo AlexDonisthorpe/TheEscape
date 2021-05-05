@@ -1,6 +1,7 @@
 // Copyright Alex Donisthorpe 2021
 
-
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 #include "MovingDoor.h"
 
 #define LOG_TO_SCREEN(Text) \
@@ -14,6 +15,9 @@ UMovingDoor::UMovingDoor()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+
+	
+
 }
 
 
@@ -32,6 +36,8 @@ void UMovingDoor::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
 		LOG_TO_SCREEN(*LogText);
 	}
+
+	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
 
