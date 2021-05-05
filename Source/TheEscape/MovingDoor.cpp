@@ -3,6 +3,9 @@
 
 #include "MovingDoor.h"
 
+#define LOG_TO_SCREEN(Text) \
+GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, (TEXT("%s"), (FString)Text));
+
 // Sets default values for this component's properties
 UMovingDoor::UMovingDoor()
 {
@@ -20,8 +23,15 @@ void UMovingDoor::BeginPlay()
 {
 	Super::BeginPlay();
 	InitialLocation = GetOwner()->GetActorLocation();
-	CurrentPosition = InitialLocation;
+	CurrentLocation = InitialLocation;
 	TargetPosition += InitialLocation;
+
+	if(!PressurePlate)
+	{
+		const FString LogText = FString::Printf(TEXT("%s has open door component, but no trigger set!"), *GetOwner()->GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
+		LOG_TO_SCREEN(*LogText);
+	}
 }
 
 
@@ -30,9 +40,14 @@ void UMovingDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	CurrentPosition = FMath::Lerp(CurrentPosition, TargetPosition, DeltaTime * 1.f);
-	GetOwner()->SetActorLocation(CurrentPosition);
-	
-	// ...
+	if(PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
+	{
+		MoveDoor(DeltaTime);
+	}
 }
-
+	
+void UMovingDoor::MoveDoor(float DeltaTime)
+{
+	CurrentLocation = FMath::Lerp(CurrentLocation, TargetPosition, DeltaTime * 1.f);
+	GetOwner()->SetActorLocation(CurrentLocation);		
+}

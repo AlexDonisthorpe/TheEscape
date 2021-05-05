@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Engine/TriggerVolume.h"
+
 #include "MovingDoor.generated.h"
 
 
@@ -23,9 +25,18 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	void CloseDoor();
+	void MoveDoor(float DeltaTime);
+
+private:
+	FVector InitialLocation;
+	FVector CurrentLocation;
+
 	UPROPERTY(EditAnywhere);
 	FVector TargetPosition;
-	FVector CurrentPosition;
-	FVector InitialLocation;
+
+	UPROPERTY(EditAnywhere)
+	ATriggerVolume* PressurePlate;
+
+	UPROPERTY(EditAnywhere)
+	AActor* ActorThatOpens;
 };
