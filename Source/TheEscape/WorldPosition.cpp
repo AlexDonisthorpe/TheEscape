@@ -1,4 +1,6 @@
 #include "WorldPosition.h"
+
+#include "Engine/TriggerVolume.h"
 #include "GameFramework/Actor.h"
 
 #define LOG_TO_SCREEN(Text) \
