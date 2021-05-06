@@ -13,14 +13,7 @@ UMovingDoor::UMovingDoor()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
-
-	
-
 }
-
-
 
 // Called when the game starts
 void UMovingDoor::BeginPlay()
@@ -49,11 +42,21 @@ void UMovingDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	if(PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
 	{
 		MoveDoor(DeltaTime);
+	} else
+	{
+		CloseDoor(DeltaTime);
 	}
 }
 	
-void UMovingDoor::MoveDoor(float DeltaTime)
+void UMovingDoor::MoveDoor(const float DeltaTime)
 {
 	CurrentLocation = FMath::Lerp(CurrentLocation, TargetPosition, DeltaTime * 1.f);
 	GetOwner()->SetActorLocation(CurrentLocation);		
 }
+
+void UMovingDoor::CloseDoor(const float DeltaTime)
+{
+	CurrentLocation = FMath::Lerp(CurrentLocation, InitialLocation, DeltaTime * 1.f);
+	GetOwner()->SetActorLocation(CurrentLocation);
+}
+
