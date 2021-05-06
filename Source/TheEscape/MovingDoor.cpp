@@ -42,21 +42,27 @@ void UMovingDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	if(PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
 	{
 		MoveDoor(DeltaTime);
+		DoorLastMoved = GetWorld()->GetTimeSeconds();
 	} else
 	{
-		CloseDoor(DeltaTime);
+		if((GetWorld()->GetTimeSeconds()-DoorLastMoved) > DoorReturnDelay)
+		{
+			ReturnDoor(DeltaTime);
+		}
 	}
+
+	
 }
 	
 void UMovingDoor::MoveDoor(const float DeltaTime)
 {
-	CurrentLocation = FMath::Lerp(CurrentLocation, TargetPosition, DeltaTime * 1.f);
+	CurrentLocation = FMath::Lerp(CurrentLocation, TargetPosition, DeltaTime * DoorMoveSpeed);
 	GetOwner()->SetActorLocation(CurrentLocation);		
 }
 
-void UMovingDoor::CloseDoor(const float DeltaTime)
+void UMovingDoor::ReturnDoor(const float DeltaTime)
 {
-	CurrentLocation = FMath::Lerp(CurrentLocation, InitialLocation, DeltaTime * 1.f);
+	CurrentLocation = FMath::Lerp(CurrentLocation, InitialLocation, DeltaTime * DoorMoveSpeed);
 	GetOwner()->SetActorLocation(CurrentLocation);
 }
 

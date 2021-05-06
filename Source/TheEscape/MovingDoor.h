@@ -23,7 +23,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void CloseDoor(const float DeltaTime);
+	void ReturnDoor(const float DeltaTime);
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void MoveDoor(float DeltaTime);
@@ -40,4 +40,12 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	AActor* ActorThatOpens;
+
+	UPROPERTY(EditAnywhere)
+	float DoorMoveSpeed = 1.f;
+	
+	float DoorLastMoved = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float DoorReturnDelay = 2.f;
 };
