@@ -28,10 +28,16 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	LogText = TEXT("Grabber Reporting for duty");
-	UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
-	LOG_TO_SCREEN(*LogText);
+	// Check for phsyics handle
+	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+
+	if(!PhysicsHandle)
+	{
+		FString LogText = FString::Printf(TEXT("%s: Physics Handler not found."), *GetOwner()->GetName());
+		
+		UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
+		LOG_TO_SCREEN(*LogText);
+	}
 }
 
 
