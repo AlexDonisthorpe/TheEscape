@@ -28,16 +28,34 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Check for phsyics handle
+	const FString OwnerName = GetOwner()->GetName();
+
+	// Check for physics handle
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 
 	if(!PhysicsHandle)
 	{
-		FString LogText = FString::Printf(TEXT("%s: Physics Handler not found."), *GetOwner()->GetName());
-		
-		UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
-		LOG_TO_SCREEN(*LogText);
+		LogText = FString::Printf(TEXT("%s: Physics Handler not found."), *OwnerName);
+	} else
+	{
+		LogText = FString::Printf(TEXT("%s: Physics Handler found."), *OwnerName);
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
+	LOG_TO_SCREEN(*LogText);
+
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if(InputComponent)
+	{
+		LogText = FString::Printf(TEXT("%s: Input Component found."), *OwnerName);
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	} else
+	{
+		LogText = FString::Printf(TEXT("%s: Input Component missing."), *OwnerName);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
+	LOG_TO_SCREEN(*LogText);
 }
 
 
@@ -81,10 +99,17 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	if(ActorHit)
 	{
-		FString ActorName = FString::Printf(TEXT("%s"), *ActorHit->GetName());
+		LogText = FString::Printf(TEXT("%s"), *ActorHit->GetName());
 
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *ActorName);
-		LOG_TO_SCREEN(*ActorName);
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
+		LOG_TO_SCREEN(*LogText);
 	}
+}
+
+void UGrabber::Grab()
+{
+	LogText = TEXT("Grabber Key Pressed");
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
+	LOG_TO_SCREEN(*LogText);
 }
 

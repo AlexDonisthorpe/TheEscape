@@ -33,5 +33,8 @@ private:
 	float Reach = 500.f;
 
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
+	UInputComponent* InputComponent =  nullptr;
+
+	void Grab();
 	
 };
