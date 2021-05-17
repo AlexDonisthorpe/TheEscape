@@ -27,4 +27,7 @@ public:
 private:
 	FString LogText;
 	
+	UPROPERTY(EditAnywhere)
+	float Reach = 500.f;
+	
 };

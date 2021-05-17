@@ -3,6 +3,10 @@
 
 #include "Grabber.h"
 
+#include <Windows.ApplicationModel.Appointments.h>
+
+#include "DrawDebugHelpers.h"
+
 #define LOG_TO_SCREEN(Text) \
 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, (TEXT("%s"), (FString)Text));
 
@@ -46,10 +50,21 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		*PlayerViewRotation.ToString()
 	);
 	
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
-	LOG_TO_SCREEN(*LogText);
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
+	//LOG_TO_SCREEN(*LogText);
 	
 	// Raycast from player to distance (Reach)
+	FVector LineTraceEnd = PlayerViewLocation + (PlayerViewRotation.Vector() * Reach);
+	
+	DrawDebugLine(GetWorld(),
+		PlayerViewLocation,
+		LineTraceEnd,
+		FColor(255, 0, 0, 255),
+		false,
+		0,
+		0,
+		5
+		);
 
 	// See what it hits
 }
