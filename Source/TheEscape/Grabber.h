@@ -17,7 +17,6 @@ class THEESCAPE_API UGrabber : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UGrabber();
-
 	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -40,5 +39,7 @@ private:
 	void Release();
 	void FindPhysicsHandle();
 	void SetupInputComponent();
+	FVector GetRayEndpoint() const;
+	FVector GetPlayerLocation() const;
 	FHitResult GetPhysicsBodyInRange();
 };

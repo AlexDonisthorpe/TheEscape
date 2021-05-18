@@ -1,15 +1,10 @@
 // Copyright Alex Donisthorpe 2021
 
-
-#include "Grabber.h"
-
-#include <Windows.ApplicationModel.Appointments.h>
-
 #include "DrawDebugHelpers.h"
+#include "Grabber.h"
 
 #define LOG_TO_SCREEN(Text) \
 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, (TEXT("%s"), (FString)Text));
-
 #define OUT 
 
 // Sets default values for this component's properties
@@ -36,21 +31,22 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if(PhysicsHandle->GrabbedComponent)
+	{
+		PhysicsHandle->SetTargetLocation(GetRayEndpoint());
+	}
 }
 
 void UGrabber::FindPhysicsHandle()
 {
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 
- 	if(PhysicsHandle)
+ 	if(PhysicsHandle == nullptr)
 	{
-		LogText = FString::Printf(TEXT("%s: Physics Handler found."), *OwnerName);
-	} else
-	{
-		LogText = FString::Printf(TEXT("%s: Physics Handler not found."), *OwnerName);
+ 		LogText = FString::Printf(TEXT("%s: Physics Handler not found."), *OwnerName);
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
+	
+	UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
 	LOG_TO_SCREEN(*LogText);
 }
 
@@ -66,40 +62,56 @@ void UGrabber::SetupInputComponent()
 
 void UGrabber::Grab()
 {
-	LogText = TEXT("Grabber Key Pressed");
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
-	LOG_TO_SCREEN(*LogText);
+	FHitResult HitResult = GetPhysicsBodyInRange();
+	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
 
-	GetPhysicsBodyInRange();
+	if(HitResult.GetActor())
+	{
+		PhysicsHandle->GrabComponentAtLocation(
+		ComponentToGrab,
+		NAME_None,
+		GetRayEndpoint()
+		);
+	}
 }
 
 void UGrabber::Release()
 {
-	LogText = TEXT("Grabber Key Released");
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *LogText);
-	LOG_TO_SCREEN(*LogText);
+	if(PhysicsHandle->GrabbedComponent)
+	{
+		PhysicsHandle->ReleaseComponent();
+	}
 }
 
-FHitResult UGrabber::GetPhysicsBodyInRange()
+FVector UGrabber::GetRayEndpoint() const
 {
-	// Get Players viewpoint
 	FVector PlayerViewLocation;
 	FRotator PlayerViewRotation;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(OUT PlayerViewLocation, OUT PlayerViewRotation);
 
-	LogText = FString::Printf(TEXT("Player Position: %s\nPlayer Rotation:%s"),
-		*PlayerViewLocation.ToString(),
-		*PlayerViewRotation.ToString()
-	);
+	return PlayerViewLocation + (PlayerViewRotation.Vector() * Reach);
+}
 
-	// Raycast from player to distance (Reach)
-	FVector LineTraceEnd = PlayerViewLocation + (PlayerViewRotation.Vector() * Reach);
+FVector UGrabber::GetPlayerLocation() const
+{
+	// Get Players viewpoint
+	FVector PlayerViewLocation;
+	FRotator PlayerViewRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewLocation,
+		OUT PlayerViewRotation
+		);
 
+	return PlayerViewLocation;
+}
+
+FHitResult UGrabber::GetPhysicsBodyInRange()
+{
 	FHitResult Hit;
 	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
-	
-	GetWorld()->LineTraceSingleByObjectType(OUT Hit, PlayerViewLocation, LineTraceEnd, FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParams);
-	// See what it hits
+
+	GetWorld()->LineTraceSingleByObjectType(OUT Hit, GetPlayerLocation(), GetRayEndpoint(), FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody), TraceParams);
+
 	AActor* ActorHit = Hit.GetActor();
 
 	if(ActorHit)
