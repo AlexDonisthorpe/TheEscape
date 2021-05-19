@@ -4,6 +4,8 @@
 #include "GameFramework/PlayerController.h"
 #include "MovingDoor.h"
 
+#include "Components/AudioComponent.h"
+
 #define LOG_TO_SCREEN(Text) \
 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, (TEXT("%s"), (FString)Text));
 
@@ -15,6 +17,8 @@ UMovingDoor::UMovingDoor()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+
+
 // Called when the game starts
 void UMovingDoor::BeginPlay()
 {
@@ -23,14 +27,8 @@ void UMovingDoor::BeginPlay()
 	CurrentLocation = InitialLocation;
 	TargetPosition += InitialLocation;
 
-	if(!PressurePlate)
-	{
-		const FString LogText = FString::Printf(TEXT("%s has open door component, but no trigger set!"), *GetOwner()->GetName());
-		UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
-		LOG_TO_SCREEN(*LogText);
-	}
-
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
+	FindPressurePlate();
+	FindAudioComponent();
 }
 
 // Called every frame
@@ -53,8 +51,17 @@ void UMovingDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	
 void UMovingDoor::MoveDoor(const float DeltaTime)
 {
+	// Reset Return Sound
+	ReturnSoundPlayed = false;
+	
 	CurrentLocation = FMath::Lerp(CurrentLocation, TargetPosition, DeltaTime * DoorMoveSpeed);
-	GetOwner()->SetActorLocation(CurrentLocation);		
+	GetOwner()->SetActorLocation(CurrentLocation);
+
+	if(!AudioComponent) { return; }
+	if(MoveSoundPlayed) { return; }
+	
+	AudioComponent->Play();
+	MoveSoundPlayed = true;
 }
 
 float UMovingDoor::TotalMassOfActors() const
@@ -75,7 +82,37 @@ float UMovingDoor::TotalMassOfActors() const
 
 void UMovingDoor::ReturnDoor(const float DeltaTime)
 {
+	// Reset Move Sound
+	MoveSoundPlayed = false;
+	
 	CurrentLocation = FMath::Lerp(CurrentLocation, InitialLocation, DeltaTime * DoorMoveSpeed);
 	GetOwner()->SetActorLocation(CurrentLocation);
+
+	if(!AudioComponent) { return; }
+	if(ReturnSoundPlayed) { return; }
+	
+	AudioComponent->Play();
+	ReturnSoundPlayed = true;
 }
 
+void UMovingDoor::FindPressurePlate()
+{
+	if(!PressurePlate)
+	{
+		const FString LogText = FString::Printf(TEXT("%s has open door component, but no trigger set!"), *GetOwner()->GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
+		LOG_TO_SCREEN(*LogText);
+	}
+}
+
+void UMovingDoor::FindAudioComponent()
+{
+	AudioComponent = GetOwner()->FindComponentByClass<UAudioComponent>();
+
+	if(!AudioComponent)
+	{
+		const FString LogText = FString::Printf(TEXT("%s can't find audio component."), *GetOwner()->GetName());
+		UE_LOG(LogTemp, Error, TEXT("%s"), *LogText);
+		LOG_TO_SCREEN(*LogText);
+	}
+}

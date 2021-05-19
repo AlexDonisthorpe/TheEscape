@@ -17,19 +17,19 @@ class THEESCAPE_API UMovingDoor : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UMovingDoor();
+	void FindPressurePlate();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:
-	void ReturnDoor(const float DeltaTime);
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void ReturnDoor(const float DeltaTime);
 	void MoveDoor(float DeltaTime);
-
 	float TotalMassOfActors() const;
-
+	void FindAudioComponent();
+	
 private:
 	FVector InitialLocation;
 	FVector CurrentLocation;
@@ -53,4 +53,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float DoorReturnDelay = 2.f;
+
+	bool MoveSoundPlayed = false;
+	bool ReturnSoundPlayed = true;
+	
+	UPROPERTY()
+	UAudioComponent* AudioComponent;
 };
