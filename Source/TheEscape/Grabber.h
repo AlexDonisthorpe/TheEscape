@@ -26,7 +26,6 @@ public:
 	virtual void BeginPlay() override;
 	
 private:
-	FString LogText;
 	FString OwnerName;
 	
 	UPROPERTY(EditAnywhere)
@@ -41,5 +40,5 @@ private:
 	void SetupInputComponent();
 	FVector GetRayEndpoint() const;
 	FVector GetPlayerLocation() const;
-	FHitResult GetPhysicsBodyInRange();
+	FHitResult GetPhysicsBodyInRange() const;
 };

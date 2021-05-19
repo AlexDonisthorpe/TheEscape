@@ -1,7 +1,5 @@
-#include "WorldPosition.h"
-
-#include "Engine/TriggerVolume.h"
 #include "GameFramework/Actor.h"
+#include "WorldPosition.h"
 
 #define LOG_TO_SCREEN(Text) \
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, (TEXT("%s"), (FString)Text));

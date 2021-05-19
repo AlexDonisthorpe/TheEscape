@@ -33,13 +33,12 @@ void UMovingDoor::BeginPlay()
 	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 }
 
-
 // Called every frame
 void UMovingDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if(PressurePlate && PressurePlate->IsOverlappingActor(ActorThatOpens))
+	if(TotalMassOfActors() > MassToOpenDoors)
 	{
 		MoveDoor(DeltaTime);
 		DoorLastMoved = GetWorld()->GetTimeSeconds();
@@ -50,14 +49,28 @@ void UMovingDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 			ReturnDoor(DeltaTime);
 		}
 	}
-
-	
 }
 	
 void UMovingDoor::MoveDoor(const float DeltaTime)
 {
 	CurrentLocation = FMath::Lerp(CurrentLocation, TargetPosition, DeltaTime * DoorMoveSpeed);
 	GetOwner()->SetActorLocation(CurrentLocation);		
+}
+
+float UMovingDoor::TotalMassOfActors() const
+{
+	float TotalMass = 0.f;
+
+	if(!PressurePlate){return TotalMass;}
+	
+	TArray<AActor*> OverlappingActors;
+	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
+
+	for (AActor* Actor : OverlappingActors)
+	{
+		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+	return TotalMass;
 }
 
 void UMovingDoor::ReturnDoor(const float DeltaTime)

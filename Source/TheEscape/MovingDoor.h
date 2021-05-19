@@ -28,6 +28,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void MoveDoor(float DeltaTime);
 
+	float TotalMassOfActors() const;
+
 private:
 	FVector InitialLocation;
 	FVector CurrentLocation;
@@ -36,11 +38,14 @@ private:
 	FVector TargetPosition;
 
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PressurePlate;
+	ATriggerVolume* PressurePlate = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	AActor* ActorThatOpens;
+	AActor* ActorThatOpens = nullptr;
 
+	UPROPERTY(EditAnywhere)
+	float MassToOpenDoors = 50.f;
+	
 	UPROPERTY(EditAnywhere)
 	float DoorMoveSpeed = 1.f;
 	
