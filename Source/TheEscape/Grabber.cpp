@@ -34,7 +34,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	if(!PhysicsHandle){return;}
 	if(PhysicsHandle->GrabbedComponent)
 	{
-		PhysicsHandle->SetTargetLocation(GetRayEndpoint());
+		PhysicsHandle->SetTargetLocationAndRotation(GetGrabbedLocation(), GetGrabbedRotation());
 	}
 }
 
@@ -62,19 +62,21 @@ void UGrabber::SetupInputComponent()
 
 void UGrabber::Grab()
 {
-	FHitResult HitResult = GetPhysicsBodyInRange();
-	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
+	HitResult = GetPhysicsBodyInRange();
+	ComponentToGrab = HitResult.GetComponent();
 	
 	if(HitResult.GetActor())
 	{
 		if(!PhysicsHandle){return;}
 		
-		PhysicsHandle->GrabComponentAtLocation(
+		PhysicsHandle->GrabComponentAtLocationWithRotation(
 		ComponentToGrab,
 		NAME_None,
-		GetRayEndpoint()
+		HitResult.Location,
+		HitResult.Actor->GetActorRotation()
 		);
 	}
+
 }
 
 void UGrabber::Release()
@@ -98,6 +100,32 @@ FVector UGrabber::GetRayEndpoint() const
 		);
 
 	return PlayerViewLocation + (PlayerViewRotation.Vector() * Reach);
+}
+
+FVector UGrabber::GetGrabbedLocation()
+{
+	FVector PlayerViewLocation;
+	FRotator PlayerViewRotation;
+	
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewLocation,
+		OUT PlayerViewRotation
+		);
+
+	return PlayerViewLocation + (PlayerViewRotation.Vector() * HitResult.Distance);
+}
+
+FRotator UGrabber::GetGrabbedRotation()
+{
+	FVector PlayerViewLocation;
+	FRotator PlayerViewRotation;
+	
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+	OUT PlayerViewLocation,
+	OUT PlayerViewRotation
+	);
+
+	return FRotator(PlayerViewRotation.Pitch, PlayerViewRotation.Yaw + 90.f, PlayerViewRotation.Roll);
 }
 
 FVector UGrabber::GetPlayerLocation() const

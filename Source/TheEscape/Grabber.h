@@ -27,6 +27,8 @@ public:
 	
 private:
 	FString OwnerName;
+	FHitResult HitResult;
+	UPrimitiveComponent* ComponentToGrab;
 	
 	UPROPERTY(EditAnywhere)
 	float Reach = 500.f;
@@ -41,6 +43,8 @@ private:
 	void FindPhysicsHandle();
 	void SetupInputComponent();
 	FVector GetRayEndpoint() const;
+	FVector GetGrabbedLocation();
+	FRotator GetGrabbedRotation();
 	FVector GetPlayerLocation() const;
 	FHitResult GetPhysicsBodyInRange() const;
 };
