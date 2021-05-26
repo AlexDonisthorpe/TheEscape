@@ -31,6 +31,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	CheckForObjectHighlight();	
+	
 	if(!PhysicsHandle){return;}
 	if(PhysicsHandle->GrabbedComponent)
 	{
@@ -152,5 +154,29 @@ FHitResult UGrabber::GetPhysicsBodyInRange() const
 	return Hit;
 }
 
+void UGrabber::CheckForObjectHighlight()
+{
+	FHitResult Hit = GetPhysicsBodyInRange();
+
+	if(Hit.GetActor())
+	{
+		if(Hit.GetActor() == HighlightedObject){ return; }
+		
+		HighlightedObject = Hit.GetActor();
+
+		auto ActorArray = HighlightedObject->FindComponentByClass<UPrimitiveComponent>();
+		ActorArray[0].SetRenderCustomDepth(true);
+	} else
+	{
+		if(HighlightedObject)
+		{
+			auto ActorArray = HighlightedObject->FindComponentByClass<UPrimitiveComponent>();
+			ActorArray[0].SetRenderCustomDepth(false);
+
+			HighlightedObject = nullptr;
+		}
+	}
+
+}
 
 

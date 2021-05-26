@@ -29,6 +29,9 @@ private:
 	FString OwnerName;
 	FHitResult HitResult;
 	UPrimitiveComponent* ComponentToGrab;
+
+	AActor* OldActor = nullptr;
+	AActor* HighlightedObject = nullptr;
 	
 	UPROPERTY(EditAnywhere)
 	float Reach = 500.f;
@@ -47,4 +50,5 @@ private:
 	FRotator GetGrabbedRotation();
 	FVector GetPlayerLocation() const;
 	FHitResult GetPhysicsBodyInRange() const;
+	void CheckForObjectHighlight();
 };
