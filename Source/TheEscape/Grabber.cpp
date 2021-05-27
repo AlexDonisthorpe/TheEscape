@@ -158,25 +158,28 @@ void UGrabber::CheckForObjectHighlight()
 {
 	FHitResult Hit = GetPhysicsBodyInRange();
 
+	// If the Line Trace hits a physics object
 	if(Hit.GetActor())
 	{
+		// If it's the same object we've already got highlighted, then return
 		if(Hit.GetActor() == HighlightedObject){ return; }
 		
 		HighlightedObject = Hit.GetActor();
 
+		// Set Render Depth for the highlight material to activate
 		auto ActorArray = HighlightedObject->FindComponentByClass<UPrimitiveComponent>();
 		ActorArray[0].SetRenderCustomDepth(true);
 	} else
 	{
 		if(HighlightedObject)
 		{
+			// Turn off the highlight on the object if we're no longer hovering over it
 			auto ActorArray = HighlightedObject->FindComponentByClass<UPrimitiveComponent>();
 			ActorArray[0].SetRenderCustomDepth(false);
 
 			HighlightedObject = nullptr;
 		}
 	}
-
 }
 
 
